@@ -16,7 +16,7 @@ Functions:
 Structs:
   - Generator: Generates signed numbers using a Sequencer and Validator.
     Methods:
-  - (g *Generator) Generate() (int64, error): Produces a new signed number.
+  - (g *Generator) Generate(ctx context.Context) (int64, error): Produces a new signed number.
   - (g *Generator) Valid(value int64) bool: Verifies if the provided value is valid.
 
 Example usage:
@@ -24,6 +24,7 @@ Example usage:
 	package main
 
 	import (
+	    "context"
 	    "fmt"
 	    "myapp/id"
 	)
@@ -33,7 +34,7 @@ Example usage:
 	    validator := id.LuhnValidator()
 	    generator := id.New(sequencer, validator, time.Now().Unix())
 
-	    num, err := generator.Generate()
+	    num, err := generator.Generate(context.Background())
 	    if err != nil {
 	        fmt.Println("Error generating number:", err)
 	    } else {
@@ -47,12 +48,13 @@ Example usage:
 package id
 
 import (
+	"context"
 	"time"
 )
 
 // Sequencer is an interface for generating sequence numbers
 type Sequencer interface {
-	Generate() (int64, error)
+	Generate(ctx context.Context) (int64, error)
 }
 
 // Validator is an interface for signing and verifying numbers
@@ -69,8 +71,8 @@ type Generator struct {
 }
 
 // Generate creates a new unique ID by combining the current Unix time and a sequence number
-func (g *Generator) Generate() (int64, error) {
-	seq, err := g.sequencer.Generate()
+func (g *Generator) Generate(ctx context.Context) (int64, error) {
+	seq, err := g.sequencer.Generate(ctx)
 	if err != nil {
 		return 0, err
 	}

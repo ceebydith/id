@@ -1,6 +1,9 @@
 package id
 
-import "sync"
+import (
+	"context"
+	"sync"
+)
 
 // rangeSequencer is a Sequencer implementation that generates numbers within a specified range.
 type rangeSequencer struct {
@@ -11,7 +14,7 @@ type rangeSequencer struct {
 }
 
 // Generate produces the next number in the sequence, wrapping around to min if the max value is exceeded.
-func (s *rangeSequencer) Generate() (int64, error) {
+func (s *rangeSequencer) Generate(ctx context.Context) (int64, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

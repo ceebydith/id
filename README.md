@@ -22,6 +22,7 @@ go get github.com/ceebydith/id
 package main
 
 import (
+    "context"
     "fmt"
     "github.com/ceebydith/id"
 )
@@ -31,7 +32,7 @@ func main() {
     validator := id.LuhnValidator()
     generator := id.New(sequencer, validator)
 
-    id, err := generator.Generate()
+    id, err := generator.Generate(context.Background())
     if err != nil {
         panic(err)
     }
@@ -48,6 +49,7 @@ To use a PostgreSQL sequence as the sequencer, you need a custom implementation 
 package main
 
 import (
+    "context"
     "database/sql"
     "fmt"
     _ "github.com/lib/pq"
@@ -59,7 +61,7 @@ type pgSequencer struct {
     sequence  string
 }
 
-func (s *pgSequencer) Generate() (int64, error) {
+func (s *pgSequencer) Generate(ctx context.Context) (int64, error) {
     var value int64
     err := s.db.QueryRow(fmt.Sprintf("SELECT nextval('%s')", s.sequence)).Scan(&value)
     if err != nil {
@@ -87,7 +89,7 @@ func main() {
     validator := id.LuhnValidator()
     generator := id.New(sequencer, validator)
 
-    id, err := generator.Generate()
+    id, err := generator.Generate(context.Background())
     if err != nil {
         panic(err)
     }
